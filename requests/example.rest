@@ -1,4 +1,7 @@
-@baseUrl = http://localhost:3001/api
+@localUrl = http://localhost:3001/api
+@herokuUrl = https://protected-crag-22396.herokuapp.com/api/
+
+@baseUrl = {{herokuUrl}}
 
 ## Get all
 
