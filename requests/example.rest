@@ -1,0 +1,73 @@
+@baseUrl = http://localhost:3001/api
+
+## Get all
+
+GET {{baseUrl}}/persons
+
+### Get by id
+
+GET {{baseUrl}}/persons/2
+
+### Delete by id
+
+DELETE {{baseUrl}}/persons/2
+
+### Create new
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "name": "test {{$randomInt 0 10000000}}",
+    "number": "{{$randomInt 0 10000000}}"
+}
+
+### TODO Update existing one
+
+POST {{baseUrl}}/persons/2
+Content-Type: application/json
+
+{
+    "name": "test name",
+    "number": "0132145"
+}
+
+### Testing
+
+### Create new. Missing number
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "name": "fail name"
+}
+
+### Create new. Missing name
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "number": "1234"
+}
+
+### Create new. Existing > Run twice
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "name": "duplicate",
+    "number": "1234"
+}
+
+### Create new. Existing > Run twice
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "name": "duplicate",
+    "number": "1234"
+}
