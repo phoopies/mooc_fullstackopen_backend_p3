@@ -17,17 +17,7 @@ app.use(
     ":method :url :status :res[content-length] - :response-time ms - body :body"
   )
 );
-
-app.get("/", (_req, res) => {
-  res.send("<h1>Contact book!</h1>");
-});
-
-app.get("/info", (_req, res) => {
-  res.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p> ${new Date()} </p>
-    `);
-});
+app.use(express.static('build'))
 
 const generateId = () => {
   const id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
