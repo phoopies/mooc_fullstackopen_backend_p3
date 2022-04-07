@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const pw = process.env.DB_PASSWORD;
-const dbName = process.env.DB_NAME;
-const url = `mongodb+srv://fullstack:${pw}@moocfullstack.zrpnl.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+const url = process.env.MONGODB_URI;
 
 console.log("Connecting to database...");
 mongoose
