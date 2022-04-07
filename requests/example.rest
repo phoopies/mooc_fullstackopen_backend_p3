@@ -3,7 +3,7 @@
 
 @baseUrl = {{localUrl}}
 
-@someId = 624e93fee21af2f3d39f6127
+@someId = 624f1b3a29ed2997e0b32afd
 
 ## Get all
 
@@ -58,22 +58,22 @@ Content-Type: application/json
     "name": "fail name"
 }
 
+### Create new. Invalid number
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "name": "fail number",
+    "number": "abc"
+}
+
 ### Create new. Missing name
 
 POST {{baseUrl}}/persons
 Content-Type: application/json
 
 {
-    "number": "1234"
-}
-
-### Create new. Existing > Run twice
-
-POST {{baseUrl}}/persons
-Content-Type: application/json
-
-{
-    "name": "duplicate",
     "number": "1234"
 }
 

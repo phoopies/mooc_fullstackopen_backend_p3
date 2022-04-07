@@ -14,51 +14,27 @@ app.use(
   )
 );
 
-const validateBody = (body) => {
-  let errors = [];
-  if (!body.name) {
-    errors.concat("Name is missing")
-  }
-
-  if (!body.number) {
-    errors.concat("Number missing")
-  }
-
-  return errors;
-}
-
 app.put("/api/persons/:id", (request, response, next) => {
-  const body = request.body
-
-  errors = validateBody(body);
-  if (errors.length > 0) {
-    return response.status(400).json({
-      errors: errors
-    });
-  };
+  const body = request.body;
 
   const person = {
     name: body.name,
     number: body.number,
-    date: new Date(),
-  }
-
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
-    .then(updatedPerson => {
-      response.json(updatedPerson)
-    })
-    .catch(error => next(error))
-})
-
-app.post("/api/persons", (request, response) => {
-  const body = request.body;
-
-  errors = validateBody(body);
-  if (errors.length > 0) {
-    return response.status(400).json({
-      errors: errors
-    });
   };
+
+  Person.findByIdAndUpdate(
+    request.params.id,
+    person,
+    { new: true, runValidators: true, context: "query" }
+  )
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
+    })
+    .catch(error => next(error));
+});
+
+app.post("/api/persons", (request, response, next) => {
+  const body = request.body;
 
   // TODO
   // Person.find({}).then((persons) => {
@@ -78,9 +54,12 @@ app.post("/api/persons", (request, response) => {
     date: new Date(),
   });
 
-  person.save().then((savedPerson) => {
-    response.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      response.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/api/persons", (_req, res) => {
