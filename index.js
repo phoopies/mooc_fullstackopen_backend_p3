@@ -1,84 +1,108 @@
 const express = require("express");
 const morgan = require("morgan");
-morgan.token("body", (req, _res) => JSON.stringify(req.body));
+const errorHandler = require("./errorHandler");
+const { Person, disconnect } = require("./models/person");
 const app = express();
 
-persons = [
-  {
-    name: "b",
-    number: "123",
-    id: 2,
-  },
-];
-
+app.use(express.static("build"));
 app.use(express.json());
+
+morgan.token("body", (req, _res) => JSON.stringify(req.body));
 app.use(
   morgan(
     ":method :url :status :res[content-length] - :response-time ms - body :body"
   )
 );
-app.use(express.static('build'))
 
-const generateId = () => {
-  const id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-  const existingPerson = persons.find((person) => person.id === id);
-  // Could get stuck in a loop but very unlikely
-  return existingPerson ? generateId() : id;
-};
-
-app.post("/api/persons", (request, response) => {
-  const body = request.body;
-
+const validateBody = (body) => {
+  let errors = [];
   if (!body.name) {
-    return response.status(400).json({
-      error: "Name missing",
-    });
+    errors.concat("Name is missing")
   }
 
   if (!body.number) {
-    return response.status(400).json({
-      error: "Number missing",
-    });
+    errors.concat("Number missing")
   }
 
-  if (persons.find((person) => person.name === body.name)) {
+  return errors;
+}
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body
+
+  errors = validateBody(body);
+  if (errors.length > 0) {
     return response.status(400).json({
-      error: "Person already exists. Name must be unique",
+      errors: errors
     });
-  }
+  };
 
   const person = {
     name: body.name,
     number: body.number,
     date: new Date(),
-    id: generateId(),
+  }
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  errors = validateBody(body);
+  if (errors.length > 0) {
+    return response.status(400).json({
+      errors: errors
+    });
   };
 
-  persons = persons.concat(person);
+  // TODO
+  // Person.find({}).then((persons) => {
+  //   if (persons.find((person) => person.name === body.name)) {
+  //     response
+  //       .status(400)
+  //       .json({
+  //         error: "Person already exists. Name must be unique",
+  //       })
+  //       .end();
+  //   }
+  // });
 
-  response.json(person);
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+    date: new Date(),
+  });
+
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 app.get("/api/persons", (_req, res) => {
-  res.json(persons);
+  Person.find({}).then((persons) => res.json(persons));
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
-
-  response.status(204).end();
+  Person.findByIdAndRemove(request.params.id)
+    .then((_res) => response.status(204).end())
+    .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (_request, response) => {
@@ -87,7 +111,13 @@ const unknownEndpoint = (_request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.on("close", () => {
+  disconnect();
+});
+
+app.use(errorHandler);

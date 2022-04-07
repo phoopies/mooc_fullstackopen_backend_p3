@@ -1,7 +1,9 @@
 @localUrl = http://localhost:3001/api
 @herokuUrl = https://protected-crag-22396.herokuapp.com/api
 
-@baseUrl = {{herokuUrl}}
+@baseUrl = {{localUrl}}
+
+@someId = 624e93fee21af2f3d39f6127
 
 ## Get all
 
@@ -9,11 +11,11 @@ GET {{baseUrl}}/persons
 
 ### Get by id
 
-GET {{baseUrl}}/persons/2
+GET {{baseUrl}}/persons/{{someId}}
 
 ### Delete by id
 
-DELETE {{baseUrl}}/persons/2
+DELETE {{baseUrl}}/persons/{{someId}}
 
 ### Create new
 
@@ -25,14 +27,24 @@ Content-Type: application/json
     "number": "{{$randomInt 0 10000000}}"
 }
 
-### TODO Update existing one
+### Create new with constant name
 
-POST {{baseUrl}}/persons/2
+POST {{baseUrl}}/persons
 Content-Type: application/json
 
 {
-    "name": "test name",
-    "number": "0132145"
+    "name": "tester",
+    "number": "{{$randomInt 0 10000000}}"
+}
+
+### Update 
+
+PUT {{baseUrl}}/persons/{{someId}}
+Content-Type: application/json
+
+{
+    "name": "tester",
+    "number": "{{$randomInt 0 10000000}}"
 }
 
 ### Testing
