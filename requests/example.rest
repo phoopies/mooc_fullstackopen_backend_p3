@@ -24,7 +24,7 @@ Content-Type: application/json
 
 {
     "name": "test {{$randomInt 0 10000000}}",
-    "number": "{{$randomInt 0 10000000}}"
+    "number": "040-{{$randomInt 10000 10000000}}"
 }
 
 ### Create new with constant name
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 {
     "name": "tester",
-    "number": "{{$randomInt 0 10000000}}"
+    "number": "040-{{$randomInt 10000 10000000}}"
 }
 
 ### Update 
@@ -44,7 +44,7 @@ Content-Type: application/json
 
 {
     "name": "tester",
-    "number": "{{$randomInt 0 10000000}}"
+    "number": "040-{{$randomInt 10000 10000000}}"
 }
 
 ### Testing
@@ -84,5 +84,5 @@ Content-Type: application/json
 
 {
     "name": "duplicate",
-    "number": "1234"
+    "number": "050-00000"
 }
